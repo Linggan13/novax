@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NOVAx - INHA One-Stop Tool</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: Arial;
+      padding: 40px;
+      background-image: url('https://static.vecteezy.com/system/resources/previews/007/954/169/non_2x/french-flag-in-white-background-free-vector.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      color: #fff;
+    }
+    .container {
+      background: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 800px;
+      margin: auto;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      position: relative;
+    }
+    .logo {
+      display: block;
+      margin: 0 auto 20px auto;
+      width: 150px;
+    }
+    h1 {
+      text-align: center;
+      font-family: Arial, sans-serif;
+      font-size: 4rem;
+      margin-bottom: 10px;
+      background: linear-gradient(to right, #0055A4, #ffffff, #EF4135);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    h2 {
+      text-align: center;
+      color: #ffffff;
+      font-size: 1.4rem;
+      margin-top: 0;
+    }
+    .tabs {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .tab {
+      padding: 10px 20px;
+      background: #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 5px;
+      color: black;
+    }
+    .tab.active {
+      background: #007bff;
+      color: white;
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    input, select, button {
+      width: 100%;
+      margin-top: 15px;
+      padding: 10px;
+      font-size: 1rem;
+    }
+    .drop-zone {
+      border: 2px dashed #007bff;
+      border-radius: 10px;
+      padding: 30px;
+      text-align: center;
+      color: #007bff;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+    .drop-zone.dragover {
+      background-color: #e0f0ff;
+    }
+    .output {
+      margin-top: 20px;
+      text-align: center;
+    }
+    a.download-link {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+    }
+    iframe.remove-tool {
+      width: 100%;
+      height: 600px;
+      border: none;
+      border-radius: 12px;
+      margin-top: 20px;
+    }
+    .clock {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 1.1rem;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="clock" id="clock"></div>
+    <img class="logo" src="https://logomaker.designfreelogoonline.com/media/productdesigner/logo/resized/000595_eagle_logo_design_free_logos-02.png" alt="Dassault Systèmes Logo">
+    <h1>NOVAx</h1>
+    <h2>INHA One-Stop Tool</h2>
+
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('convert')">File Converter</div>
+      <div class="tab" onclick="showTab('edit')">Image Editor</div>
+      <div class="tab" onclick="showTab('enhance')">Image Enhancer</div>
+      <div class="tab" onclick="showTab('remove')">Remove Text</div>
+    </div>
+
+    <!-- File Converter -->
+    <div id="convert" class="tab-content active">
+      <label for="fileInput">Upload your file:</label>
+      <input type="file" id="fileInput" accept="image/jpeg, image/png, video/mp4">
+      <div class="drop-zone" id="dropZone">or drag and drop a file here</div>
+      <label for="conversionType">Select conversion type:</label>
+      <select id="conversionType">
+        <option value="image-webp">Image: JPG/PNG to WEBP</option>
+        <option value="icon-svg">Icon: JPG/PNG to SVG</option>
+        <option value="video-hevc">Video: MP4 to HEVC</option>
+      </select>
+      <button onclick="convertFile()">Convert</button>
+      <div class="output" id="output"></div>
+    </div>
+
+    <!-- Image Editor -->
+    <div id="edit" class="tab-content">
+      <div class="drop-zone" id="editDropZone">or drag and drop an image to edit</div>
+      <input type="file" id="cropImageInput" accept="image/*">
+      <select id="presetSizes">
+        <option value="1905x540">Discover Page (1905x540)</option>
+        <option value="1600x900">Events/eSeminar (1600x900)</option>
+        <option value="1080x900">Invest (1080x900)</option>
+      </select>
+      <div class="preview-container">
+        <img id="cropImage" style="max-width:100%; display:none;">
+      </div>
+      <button id="cropDownload">Crop & Download</button>
+      <div id="cropResult"></div>
+    </div>
+
+    <!-- Image Enhancer -->
+    <div id="enhance" class="tab-content">
+      <iframe class="remove-tool" src="https://picsart.com/ai-image-enhancer/" style="height:700px"></iframe>
+    </div>
+
+    <!-- Remove Text -->
+    <div id="remove" class="tab-content">
+      <iframe class="remove-tool" src="https://cleanup.pictures"></iframe>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+  <script>
+    function showTab(tabId) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      document.querySelector(`.tab[onclick="showTab('${tabId}')"]`).classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    const cropImageInput = document.getElementById('cropImageInput');
+    const cropImage = document.getElementById('cropImage');
+    const presetSizes = document.getElementById('presetSizes');
+    let cropper;
+
+    cropImageInput.addEventListener('change', handleImageUpload);
+    document.getElementById('editDropZone').addEventListener('drop', e => {
+      e.preventDefault();
+      const file = e.dataTransfer.files[0];
+      if (file) loadImage(file);
+    });
+    document.getElementById('editDropZone').addEventListener('dragover', e => e.preventDefault());
+
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) loadImage(file);
+    }
+
+    function loadImage(file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        cropImage.src = reader.result;
+        cropImage.style.display = 'block';
+        if (cropper) cropper.destroy();
+        cropImage.onload = () => {
+          const [w, h] = presetSizes.value.split('x').map(Number);
+          cropper = new Cropper(cropImage, {
+            viewMode: 1,
+            aspectRatio: w / h,
+            autoCropArea: 1,
+          });
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+
+    presetSizes.addEventListener('change', () => {
+      if (cropper) {
+        const [w, h] = presetSizes.value.split('x').map(Number);
+        cropper.setAspectRatio(w / h);
+      }
+    });
+
+    document.getElementById('cropDownload').addEventListener('click', () => {
+      if (!cropper) return;
+      const [w, h] = presetSizes.value.split('x').map(Number);
+      const canvas = cropper.getCroppedCanvas({ width: w, height: h });
+      canvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `cropped-${w}x${h}.webp`;
+        link.textContent = '📥 Download Cropped Image';
+        link.className = 'download-link';
+        const result = document.getElementById('cropResult');
+        result.innerHTML = '';
+        result.appendChild(link);
+      }, 'image/webp');
+    });
+
+    // Clock
+    function updateClock() {
+      const now = new Date();
+      const clock = document.getElementById('clock');
+      clock.textContent = now.toLocaleString();
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+</body>
+</html>
